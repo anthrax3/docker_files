@@ -42,5 +42,11 @@ RUN mkdir warmup \
     && rm -rf warmup \
     && rm -rf /tmp/NuGetScratch
 
-RUN groupadd -g ${groupid} docker && usermod -a -G docker jenkins 
+RUN curl -sL https://deb.nodesource.com/setup_6.x | bash -
+RUN apt-get install -y nodejs
+RUN apt-get install -y build-essential
+RUN npm install -g bower --allow-root
+
+RUN groupadd -g ${groupid} docker && usermod -a -G docker jenkins
+
 USER jenkins
