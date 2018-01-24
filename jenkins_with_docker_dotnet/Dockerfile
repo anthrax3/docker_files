@@ -5,9 +5,11 @@ MAINTAINER kerryjiang
 ENV groupid 1002
 USER root
 
-RUN apt-get -y install git
 
-# Install .NET CLI dependencies
+RUN apt-get -y install git
+RUN apt-get -y install nodejs
+
+
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         libc6 \
@@ -24,10 +26,12 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Install .NET Core SDK
-ENV DOTNET_SDK_VERSION 1.0.4
-ENV DOTNET_SDK_DOWNLOAD_URL https://dotnetcli.blob.core.windows.net/dotnet/Sdk/$DOTNET_SDK_VERSION/dotnet-dev-debian-x64.$DOTNET_SDK_VERSION.tar.gz
+ENV DOTNET_SDK_VERSION 2.1.3
+ENV DOTNET_SDK_DOWNLOAD_URL https://dotnetcli.blob.core.windows.net/dotnet/Sdk/$DOTNET_SDK_VERSION/dotnet-sdk-$DOTNET_SDK_VERSION-linux-x64.tar.gz
+ENV DOTNET_SDK_DOWNLOAD_SHA 509b88895fd5a6a90e245141eb52f188aa9ee7d20188c213892483c142900d6975013aef9ca6d8da986cc5617a2c3571e22318297c51578b871c047602757600
 
 RUN curl -SL $DOTNET_SDK_DOWNLOAD_URL --output dotnet.tar.gz \
+    && echo "$DOTNET_SDK_DOWNLOAD_SHA dotnet.tar.gz" | sha512sum -c - \
     && mkdir -p /usr/share/dotnet \
     && tar -zxf dotnet.tar.gz -C /usr/share/dotnet \
     && rm dotnet.tar.gz \
@@ -37,16 +41,10 @@ RUN curl -SL $DOTNET_SDK_DOWNLOAD_URL --output dotnet.tar.gz \
 ENV NUGET_XMLDOC_MODE skip
 RUN mkdir warmup \
     && cd warmup \
-    && dotnet new \
+    && dotnet new console\
     && cd .. \
     && rm -rf warmup \
     && rm -rf /tmp/NuGetScratch
 
-RUN curl -sL https://deb.nodesource.com/setup_6.x | bash -
-RUN apt-get install -y nodejs
-RUN apt-get install -y build-essential
-RUN npm install -g bower --allow-root
-
-RUN groupadd -g ${groupid} docker && usermod -a -G docker jenkins
-
+RUN groupadd -g ${groupid} docker && usermod -a -G docker jenkins 
 USER jenkins
