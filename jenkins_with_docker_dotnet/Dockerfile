@@ -7,8 +7,6 @@ USER root
 
 
 RUN apt-get -y install git
-RUN apt-get -y install nodejs
-
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -45,6 +43,10 @@ RUN mkdir warmup \
     && cd .. \
     && rm -rf warmup \
     && rm -rf /tmp/NuGetScratch
+
+RUN curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+RUN apt-get install -y nodejs		
+RUN apt-get install -y build-essential
 
 RUN groupadd -g ${groupid} docker && usermod -a -G docker jenkins 
 USER jenkins
